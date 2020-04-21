@@ -1,6 +1,8 @@
 # HasPyC
 
-**HasPyC** is the **Python** connector to **HasDB**, which is a
+**HasPyC** is the **Python** connector to
+[HasDB](https://github.com/e-wrks/hasdb)
+, which is a
 [DBMS](https://en.wikipedia.org/wiki/Database#Database_management_system)
 that manages
 [in-memory](https://en.wikipedia.org/wiki/In-memory_database)
