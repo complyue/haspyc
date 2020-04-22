@@ -3,10 +3,14 @@ HasDB connector
 
 """
 from .app import *
+from .rt import *
 
 __all__ = [
 
     # exports from .app
-    'run_dbc_app', 'make_dbc',
+    'DbClient',
+
+    # exports from .rt
+    'ArrayMeta', 'DbArray',
 
 ]
