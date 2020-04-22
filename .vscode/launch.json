@@ -10,6 +10,20 @@
             "program": "${workspaceFolder}/pretty-exports.py",
             "args": [],
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Basic - DML",
+            "type": "python",
+            "request": "launch",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/..",
+                "HASPYC_LOG_LEVEL": "DEBUG",
+                "HASTALK_LOG_LEVEL": "DEBUG",
+            },
+            "cwd": "${workspaceFolder}/..",
+            "program": "${workspaceFolder}/Tour/basic-dml.py",
+            "args": [],
+            "console": "integratedTerminal"
         }
     ]
 }

@@ -2,11 +2,19 @@ import asyncio
 from typing import *
 
 from hastalk import *
+from haspyc import *
 
 
+# this will be filled by per-connection peer module preparation
+# performed by EdhClient() on connection
 peer: EdhClient = None
 
 
-async def __edh_consumer__():
+# this ought to be overwritten by the per-connection peer module
+# initialization method passed to the EdhClient() ctor
+async def __dbc_main__(peer: Peer):
+    raise RuntimeError("No __dbc_main__() installed")
 
-    print("peer is: ", peer)
+
+async def __edh_consumer__():
+    await __dbc_main__(peer)

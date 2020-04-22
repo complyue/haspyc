@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [[ -z "${TERM}" ]] || [[ "dumb" == "${TERM}" ]]; then
+  # double clicked from linux desktop
+  gnome-terminal -- "${BASH_SOURCE}"
+  exit $?
+fi
+
+BEACON_SERVER="dwcc.dw"
+
+MYIP=$(
+  python -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(('${BEACON_SERVER}',80)); print(s.getsockname()[0])"
+)
+echo "*-*"
+echo "  http://${MYIP}:8888"
+echo "*-*"
+echo ""
+
+
+D=$(dirname "${BASH_SOURCE}")
+export PYTHONPATH=${D}/..
+
+
+cd ${D}/Tour
+jupyter notebook --ip="${MYIP}" --no-browser --NotebookApp.iopub_data_rate_limit=10000000000
