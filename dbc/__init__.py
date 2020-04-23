@@ -8,7 +8,7 @@ from .rt import *
 __all__ = [
 
     # exports from .app
-    'DbClient',
+    'CONIN', 'CONOUT', 'CONMSG', 'DbClient',
 
     # exports from .rt
     'ArrayMeta', 'DbArray',
