@@ -17,6 +17,8 @@ db: DbClient = None
 
 
 async def __edh_consumer__():
+    logger.debug(f"Consuming DB service via: {peer!r}")
+
     # TODO support cmd prompt change request ?
     conin_sink = peer.arm_channel(0)
 
@@ -26,15 +28,24 @@ async def __edh_consumer__():
 
     asyncio.create_task(conout_intake(peer.arm_channel(1)))
 
-    async def conlog_intake(sink):
-        async for con_log in sink.stream():
-            logger.info(con_log)
+    async def conmsg_intake(sink):
+        async for con_msg in sink.stream():
+            logger.info(con_msg)
 
-    asyncio.create_task(conlog_intake(peer.arm_channel(2)))
+    asyncio.create_task(conmsg_intake(peer.arm_channel(2)))
 
-    while True:
-        cmd_val = await peer.read_command(globals())
-        if cmd_val is EndOfStream:
-            break
-        if cmd_val is not None:
-            logger.warn(f"Unexpected peer command from DB server: {cmd_val!r}")
+    try:
+
+        while True:
+            cmd_val = await peer.read_command(globals())
+            if cmd_val is EndOfStream:
+                break
+            if cmd_val is not None:
+                logger.warn(f"Unexpected peer command from DB server: {cmd_val!r}")
+
+    finally:
+        logger.debug(f"Done with DB servie via: {peer!r}")
+
+        await peer.armed_channel(0).publish(EndOfStream)
+        await peer.armed_channel(1).publish(EndOfStream)
+        await peer.armed_channel(2).publish(EndOfStream)
