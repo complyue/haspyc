@@ -14,17 +14,23 @@ async def db_app():
     peer = await dbc.peer
 
     await peer.post_command(
-        r"""
-peer.p2c(2, repr('Starting...'))
+        expr(
+            r"""
+peer.p2c({$ CONMSG $}, repr('Starting...'))
 """
+        )
     )
 
-    await peer.post_command(
-        r"""
+    data_chan = "data1"
+    data_sink = peer.arm_channel(data_chan)
+    data_sink.run_producer(
+        peer.post_command(
+            expr(
+                r"""
 case db.deptByName[ 'Dev' ] of {
     { dev } -> { pass }
 
-    peer.p2c(2, repr(
+    peer.p2c({$ CONMSG $}, repr(
         'Populating DB contents.'
     ))
 
@@ -38,35 +44,41 @@ case db.deptByName[ 'Dev' ] of {
 }
 
 case db.personByName['Compl'] of { compl=>_ } -> {
-    peer.p2c(1, repr(
-        "Compl's record is: " ++ compl
+    peer.p2c({$ data_chan $}, repr(
+        {"name": compl.name, 'description': repr(compl)}
     ))
 }
 case db.personByName['Jim'] of { jim=>_ } -> {
-    peer.p2c(1, repr(
-        "Got a Jim ver# " ++ ( jim.version $=> 'legacy' )
+    peer.p2c({$ data_chan $}, repr(
+        {"name": jim.name, 'version': repr( jim.version $=> 'legacy' )}
     ))
 }
-peer.p2c(1, repr(
-    'Dev Org is ' ++ dev ++ ' with workers:'
+
+peer.p2c({$ data_chan $}, repr(
+    {
+        'name': dev.name, 
+        'workers': ([] =< for (ixk, workRel) from dev.workers.range() do
+            {'name': workRel.person.name, 'ixk': repr(ixk), }
+        ),
+
+    }
 ))
-for (ixk, workRel) from dev.workers.range() do
-    peer.p2c(1, repr(
-        '  ' ++ workRel.person ++ ' in order of ' ++ ixk
-    ))
 
-# some artificial delay
-for _ from console.everyMillis(200) do { break }
-
-peer.p2c(1, repr("That's it atm."))
-
-"""
+peer.p2c({$ data_chan $}, expr EndOfStream)
+peer.p2c({$ CONMSG $}, repr("That's it atm."))
+    """
+            )
+        )
     )
+    async for record in data_sink.stream():
+        print("Got data:", record)
 
     await peer.post_command(
-        r"""
-peer.p2c(2, repr('Done.'))
+        expr(
+            r"""
+peer.p2c({$ CONMSG $}, repr('Done.'))
 """
+        )
     )
 
     # wait a second to see some conout/conmsg before quitting the process
