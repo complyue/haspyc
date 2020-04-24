@@ -41,7 +41,9 @@ async def __edh_consumer__():
             if cmd_val is EndOfStream:
                 break
             if cmd_val is not None:
-                logger.warn(f"Unexpected peer command from DB server: {cmd_val!r}")
+                logger.warn(
+                    f"Unexpected peer command from DB service via: {peer!r}\n  {cmd_val!r}"
+                )
 
     finally:
         logger.debug(f"Done with DB servie via: {peer!r}")
