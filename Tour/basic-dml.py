@@ -64,8 +64,8 @@ peer.p2c({$ data_chan $}, repr(
     }
 ))
 
-peer.p2c({$ data_chan $}, expr EndOfStream)
 peer.p2c({$ CONMSG $}, repr("That's it atm."))
+peer.p2c({$ data_chan $}, expr EndOfStream)
     """
             )
         )
@@ -80,9 +80,6 @@ peer.p2c({$ CONMSG $}, repr('Done.'))
 """
         )
     )
-
-    # wait a second to see some conout/conmsg before quitting the process
-    await asyncio.sleep(1)
 
     dbc.stop()
     await dbc.join()  # reraise any error encountered
