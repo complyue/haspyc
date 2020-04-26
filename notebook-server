@@ -2,22 +2,22 @@
 D=$(dirname "${BASH_SOURCE}")
 
 
-# allow double-click launch of this script
-if [[ -z "${TERM}" ]] || [[ "dumb" == "${TERM}" ]]; then
-  # double clicked from linux desktop
-  gnome-terminal -- "${BASH_SOURCE}"
-  exit $?
-fi
-
-
 # determine a local IP interface reachable from a beacon server, in
 # case launching from a multi-ip host, use of that IP can ensure that
 # others can access the notebooks served here, from their desktops /
 # laptops connected to the same network segment as the beacon server
-BEACON_SERVER="dwcc.dw"
-MYIP=$(
-  python -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(('${BEACON_SERVER}',80)); print(s.getsockname()[0])"
-)
+#BEACON_SERVER="dwcc.dw"
+
+SERV_IP="0.0.0.0"
+if [[ -n "${BEACON_SERVER}" ]]; then
+	SERV_IP=$(
+	  python -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(('${BEACON_SERVER}',80)); print(s.getsockname()[0])"
+	)
+	echo "*-*"
+	echo "  http://${SERV_IP}:8888"
+	echo "*-*"
+	echo ""
+fi
 
 
 # set Python's adhoc search path to the workspace dir (i.e. parent dir)
@@ -32,4 +32,4 @@ cd ${D}/Tour
 
 
 # launch notebook server
-jupyter notebook --ip="${MYIP}" --no-browser --NotebookApp.iopub_data_rate_limit=10000000000
+jupyter notebook --ip="${SERV_IP}" --no-browser --NotebookApp.iopub_data_rate_limit=10000000000
