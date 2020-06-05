@@ -1,4 +1,4 @@
-# HasPyC
+# HasPyC - Python Connector to HasDB
 
 **HasPyC** is the **Python** connector to
 [HasDB](https://github.com/e-wrks/hasdb)
