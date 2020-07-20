@@ -4,6 +4,8 @@ from typing import *
 from hastalk import *
 from haspyc import *
 
+from numpy import float64, float32, int64, int32, intp, int8, bool
+
 logger = get_logger(__package__)
 
 # this will be filled by per-connection peer module preparation
