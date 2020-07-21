@@ -25,12 +25,24 @@ class DbClient:
         )
         self.peer = loop.create_future()
 
+        async def dbc_cleanup():
+            try:
+                await self.clnt.eol
+                if not self.peer.done():
+                    self.peer.set_result(None)
+            except Exception as exc:
+                if not self.peer.done():
+                    self.peer.set_exception(exc)
+
+        asyncio.create_task(dbc_cleanup())
+
     def __repr__(self):
         clnt = self.clnt
         return f"DbClient({clnt.service_addr!r}, {clnt.service_port!r})"
 
     async def __peer_init__(self, modu):
-        self.peer.set_result(modu["peer"])
+        if not self.peer.done():
+            self.peer.set_result(modu["peer"])
         modu["db"] = self
 
     def __await__(self):
