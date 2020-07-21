@@ -73,13 +73,14 @@ peer.p2c({$ data_chan $}, expr EndOfStream)
     async for record in data_sink.stream():
         print("Got data:", record)
 
-    await peer.post_command(
-        expr(
-            r"""
+    if peer.eol is False:
+        await peer.post_command(
+            expr(
+                r"""
 peer.p2c({$ CONMSG $}, repr('Done.'))
 """
+            )
         )
-    )
 
     dbc.stop()
     await dbc.join()  # reraise any error encountered

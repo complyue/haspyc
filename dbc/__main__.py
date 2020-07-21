@@ -36,6 +36,14 @@ async def __edh_consumer__():
 
     asyncio.create_task(conmsg_intake(peer.arm_channel(CONMSG)))
 
+    async def peer_err_intake(sink):
+        async for peer_err in sink.stream():
+            logger.error(peer_err)
+            if not peer.eol.done():
+                peer.eol.set_exception(RuntimeError(peer_err))
+
+    asyncio.create_task(peer_err_intake(peer.arm_channel(ERR_CHAN)))
+
     try:
 
         while True:
@@ -46,6 +54,9 @@ async def __edh_consumer__():
                 logger.warn(
                     f"Unexpected peer command from DB service via: {peer!r}\n  {cmd_val!r}"
                 )
+
+    except Exception:
+        logger.error("Error occurred with the DB.", exc_info=True)
 
     finally:
         logger.debug(f"Done with DB servie via: {peer!r}")
