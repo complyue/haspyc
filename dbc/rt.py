@@ -39,8 +39,9 @@ class DbArray:
         nbytes = dt.itemsize * np.prod(shape)
 
         data_file_path = f"{data_dir}/{data_path}.edf"
-        os.makedirs(os.path.dirname(data_file_path), mode=0o755, exist_ok=True)
-        with open(data_file_path, "r+b") as f:
+        data_file_dir = os.path.dirname(data_file_path)
+        os.makedirs(data_file_dir, mode=0o755, exist_ok=True)
+        with open(data_file_path, "w+b") as f:
             os.ftruncate(f.fileno(), nbytes)
             self.mm = mmap.mmap(
                 fileno=f.fileno(),
