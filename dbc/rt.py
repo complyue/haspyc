@@ -1,7 +1,7 @@
 import asyncio
 from typing import *
 
-import os
+import os.path
 import mmap
 import numpy as np
 
@@ -38,7 +38,9 @@ class DbArray:
         dt = np.dtype(dtype)
         nbytes = dt.itemsize * np.prod(shape)
 
-        with open(f"{data_dir}/{data_path}.edf", "r+b") as f:
+        data_file_path = f"{data_dir}/{data_path}.edf"
+        os.makedirs(os.path.dirname(data_file_path), mode=0o755, exist_ok=True)
+        with open(data_file_path, "r+b") as f:
             os.ftruncate(f.fileno(), nbytes)
             self.mm = mmap.mmap(
                 fileno=f.fileno(),
