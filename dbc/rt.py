@@ -41,14 +41,17 @@ class DbArray:
         data_file_path = f"{data_dir}/{data_path}.edf"
         data_file_dir = os.path.dirname(data_file_path)
         os.makedirs(data_file_dir, mode=0o755, exist_ok=True)
-        with open(data_file_path, "w+b") as f:
-            os.ftruncate(f.fileno(), nbytes)
+        fd = os.open(data_file_path, os.O_RDWR | os.O_CREAT, mode=0o644)
+        try:
+            os.ftruncate(fd, nbytes)
             self.mm = mmap.mmap(
-                fileno=f.fileno(),
+                fileno=fd,
                 length=nbytes,
                 flags=mmap.MAP_SHARED,
                 access=mmap.ACCESS_WRITE,
             )
+        finally:
+            os.close(fd)
 
     def __repr__(self):
         meta = self.meta
